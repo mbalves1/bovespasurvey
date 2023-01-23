@@ -62,6 +62,7 @@
 
 <script>
 // import { VueFlip } from 'vue-flip';
+import axios from 'axios'
 import { Notify } from 'quasar'
 
 export default {
@@ -85,7 +86,19 @@ export default {
       ]
     }
   },
+  created () {
+    this.getData()
+  },
   methods: {
+    getData () {
+      axios.get('https://api.hgbrasil.com/finance', { params: { format: 'json-cors', key: '99d62d31' } })
+        .then((data) => {
+          console.log(data)
+        })
+        .catch((err) => {
+          console.log('err', err)
+        })
+    },
     createAccount () {
       const { name, password, emailClient, accounts } = this
       const hasAccount = accounts.find(({ email }) => {
