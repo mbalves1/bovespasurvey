@@ -1,6 +1,16 @@
 export default function () {
   return {
     coin: '',
-    current: 'Content'
+    bitcoin: [],
+    currencies: [],
+    stocks: [],
+    taxes: [],
+    userAccount: [
+      {
+        name: 'Murilo',
+        pass: '123',
+        email: 'murilo@email.com'
+      }
+    ]
   }
 }

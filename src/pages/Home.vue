@@ -27,12 +27,12 @@
         </div>
 
         <div v-if="!create">
-          <p class="my-7" color="white">ENTRE NA SUA CONTA</p>
-          <q-input dark class="" outlined v-model="name" label="Digite seu nome" color="white" />
+          <p class="q-mt-lg" color="white">ENTRE NA SUA CONTA</p>
+          <q-input dark class="q-mt-lg" outlined v-model="name" label="Digite seu nome" color="white" />
 
-          <q-input dark class="" outlined v-model="emailClient" label="Digite seu e-mail" color="white" />
+          <q-input dark class="q-mt-lg" outlined v-model="emailCreate" label="Digite seu e-mail" color="white" />
 
-            <q-input dark v-model="passwordClient" class="" outlined :type="isPwd ? 'password' : 'text'" color="white" label="Digite seu acesso">
+            <q-input dark v-model="passCreate" class="q-mt-lg cursor-pointer" outlined :type="isPwd ? 'password' : 'text'" color="white" label="Digite seu acesso">
             <template v-slot:append>
               <q-icon
                 :name="isPwd ? 'visibility_off' : 'visibility'"
@@ -41,8 +41,8 @@
               />
             </template>
           </q-input>
-          <div class="d-flex column">
-            <q-btn class="my-7" @click="createAccount" type="submit" color="primary" label="Create Account"/>
+          <div class="d-flex column items-center">
+            <q-btn @click="createAccount" color="secondary q-mt-lg" rounded style="width:190px" label="Create Account"></q-btn>
           </div>
         </div>
       </div>
@@ -62,8 +62,8 @@
 
 <script>
 // import { VueFlip } from 'vue-flip';
-import axios from 'axios'
 import { Notify } from 'quasar'
+import { mapMutations, mapState } from 'vuex'
 
 export default {
   name: 'LoginPage',
@@ -75,49 +75,41 @@ export default {
       name: '',
       passwordClient: '',
       emailClient: '',
+      emailCreate: '',
+      passCreate: '',
       create: true,
-      isPwd: true,
-      accounts: [
-        {
-          name: 'Murilo',
-          pass: 123,
-          email: 'murilo@email.com'
-        }
-      ]
+      isPwd: true
     }
   },
   created () {
-    this.getData()
+    // this.getData()
+  },
+  computed: {
+    ...mapState('Coin', {
+      userAccount: 'userAccount'
+    })
   },
   methods: {
-    getData () {
-      axios.get('https://api.hgbrasil.com/finance', { params: { format: 'json-cors', key: '99d62d31' } })
-        .then((data) => {
-          console.log(data)
-        })
-        .catch((err) => {
-          console.log('err', err)
-        })
-    },
+    ...mapMutations('Coin', {
+      setUser: 'SET_USER'
+    }),
     createAccount () {
-      const { name, password, emailClient, accounts } = this
-      const hasAccount = accounts.find(({ email }) => {
-        if (email === emailClient) {
-          console.log('aqui')
+      const { name, passCreate, emailCreate, userAccount, setUser } = this
+      const hasAccount = userAccount.find(({ email }) => {
+        if (email === emailCreate) {
           this.create = true
           return Notify.create({
             message: 'E-mail já cadastrado!',
             color: 'teal'
           })
         } else {
-          const reason = {
-            name, password, email: emailClient
+          const accountCreated = {
+            name, pass: passCreate, email: emailCreate
           }
-          accounts.push(reason)
-          return localStorage.setItem('reason', JSON.stringify(reason))
+          setUser(accountCreated)
+          return localStorage.setItem('reason', JSON.stringify({ name, email: emailCreate }))
         }
       })
-      console.log('accounts', accounts)
       this.create = true
       Notify.create({
         message: 'Legal! Conta cadastrada com sucesso.',
@@ -125,23 +117,27 @@ export default {
       })
       return hasAccount
     },
+    console () {
+      console.log('thisuysaer', this.userAccount)
+    },
     login () {
-      const { emailClient, passwordClient, accounts } = this
-      const hasAccount = accounts.find(({ email, pass }) => {
-        if (email === emailClient) {
-          console.log('email', email)
-          console.log('emailClient', emailClient)
-          console.log('pass', pass)
-          console.log('passwordClient', Number(passwordClient))
-          return email === emailClient && pass === Number(passwordClient)
+      const { userAccount, emailClient, passwordClient } = this
+      console.log('user', userAccount)
+      const hasAccount = userAccount.filter((user) => {
+        if (user.email === emailClient) {
+          if (user.pass === passwordClient) {
+            this.$router.push({ path: '/view' })
+            console.log('user', user)
+            return true
+          }
+          return true
         } else {
           return Notify.create({
-            message: 'Por favor, verifique seu e-mail ou senha!',
+            message: 'Conta não encontrada, verifique sua senha e email, por favor.',
             color: 'negative'
           })
         }
       })
-      console.log('accounts', accounts)
       return hasAccount
     }
   }
@@ -153,6 +149,16 @@ p {
   color: white;
   margin: 30px 0;
 }
+
+@media screen and (max-width: 425px) {
+  .container {
+    &--card {
+      margin: 10px;
+      padding: 27px !important;
+    }
+  }
+}
+
 .container {
   background: #2F2F38;
   height: 100vh;

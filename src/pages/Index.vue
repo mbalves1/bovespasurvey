@@ -3,7 +3,7 @@
     <Header @open="drawer"></Header>
     <div class="slider">
       <div class="slide-track" style="z-index: 10">
-        <div class="slide" v-for="(i, index) in coins" :key="i">
+        <div class="slide" v-for="(i, index) in bitcoin" :key="i">
           <div class="q-pa-md carousel">
             <span>{{index}}</span>
             U{{format(i.usd)}}
@@ -11,34 +11,10 @@
         </div>
       </div>
     </div>
-    <q-drawer side="right" v-model="openDrawer">
-      <div class="q-pa-md" style="max-width: 350px">
-        <q-list separator>
-          <q-item clickable v-ripple style="display: flex; justify-content: center;">
-            <v-text style="font-weight: 900">DACXI</v-text>
-          </q-item>
-
-          <q-item clickable v-ripple @click="setCurrentContent">
-            <q-item-section>
-              <q-item-label>Price</q-item-label>
-              <q-item-label caption>Follow the price in real time</q-item-label>
-            </q-item-section>
-          </q-item>
-
-          <q-item clickable v-ripple @click="setCurrentFilter">
-            <q-item-section>
-              <q-item-label>Historic</q-item-label>
-              <q-item-label caption>Make history of the main crypto</q-item-label>
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </div>
-    </q-drawer>
     <!-- <q-page class="flex flex-center"> -->
     <div class="container" style="height: 100vh">
-      <component :is="routeComponent"></component>
-      <!-- <Content></Content>
-      <Filter></Filter> -->
+      <!-- <component :is="routeComponent"></component> -->
+      <Content></Content>
     </div>
     <!-- </q-page> -->
 </div>
@@ -50,45 +26,33 @@ import { defineComponent } from 'vue'
 // Componnet
 import Header from 'src/components/Header.vue'
 import Content from 'src/components/Content.vue'
-import Filter from 'src/components/Filter.vue'
 
 // mixins
 import get from 'src/mixins/get.js'
 
 // Lib
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 export default defineComponent({
-  components: { Header, Content, Filter },
+  components: { Header, Content },
   mixins: [get],
   name: 'PageIndex',
-  data () {
-    return {
-      openDrawer: false,
-      routeComponent: 'Content'
-    }
-  },
   created () {
-    this.getCoin()
+    this.getData()
+    console.log('thismercadoBitcoin', this.bitcoin)
   },
   computed: {
     ...mapState('Coin', {
-      coin: 'coin',
-      current: 'current'
+      bitcoin: 'bitcoin',
+      currencies: 'currencies',
+      stocks: 'stocks',
+      taxes: 'taxes'
     })
   },
   methods: {
-    setCurrentContent () {
-      this.routeComponent = 'Content'
-      this.openDrawer = false
-    },
-    setCurrentFilter () {
-      this.routeComponent = 'Filter'
-      this.openDrawer = false
-    },
-    drawer () {
-      this.openDrawer = !this.openDrawer
-    }
+    ...mapActions('Coin', {
+      getData: 'getData'
+    })
   }
 })
 </script>

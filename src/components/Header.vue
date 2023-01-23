@@ -1,22 +1,14 @@
 <template>
   <div class="navbar">
-    <div></div>
     <div>
       <p class="navbar--title">
-        <img src="https://dacxi.com/assets/icons/logo.png" />
+        <img src="https://d1in87wuzwnqr6.cloudfront.net/wp-content/uploads/2022/10/LOGO.svg" />
       </p>
     </div>
-    <q-btn style="color: white; margin-right: 20px" @click="openModal" icon="menu" round dense flat class="q-mr-md"></q-btn>
   </div>
 </template>
 <script>
 export default {
-  methods: {
-    openModal () {
-      console.log('open')
-      this.$emit('open')
-    }
-  }
 }
 </script>
 <style lang="scss" scoped>
@@ -26,10 +18,10 @@ export default {
 .navbar {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   height: 100px;
-  background: #222655;
+  background: #979ddd;
   border-bottom: 4px solid var(--bs-white);
 
   div {
