@@ -4,9 +4,11 @@
     <div class="slider">
       <div class="slide-track" style="z-index: 10">
         <div class="slide" v-for="(i, index) in bitcoin" :key="i">
-          <div class="q-pa-md carousel">
+          <div class="q-pa-md carousel d-flex items-center">
             <span>{{index}}</span>
-            U{{format(i.usd)}}
+            <span :style="i.variation > 1 ? 'color: green' : 'color: red'">
+              U{{format(i.variation)}}
+            </span>
           </div>
         </div>
       </div>
@@ -56,7 +58,7 @@ export default defineComponent({
   }
 })
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .carousel {
   font-size: 12px;
   font-weight: 700;
@@ -96,7 +98,7 @@ export default defineComponent({
   width: 500px;
 }
 .slider::before, .slider::after {
-  background: linear-gradient(to right, var(--bs-light-gray) 0%, rgba(255, 255, 255, 0) 100%);
+  background: linear-gradient(to right, var(--bs-light-gray) 0%, rgba(255, 255, 255, 0) 1%);
   content: "";
   height: 100px;
   position: absolute;

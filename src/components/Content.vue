@@ -1,32 +1,27 @@
 <template>
 <div>
   <div class="title">
-    <q-text>Cryptocurrency Prices by Market Cap</q-text>
+    <q-text>Principais índices e cotações</q-text>
   </div>
   <div class="q-pa-md boxx">
-    <div v-for="(i, index) in coins" :key="i" class="boxx--cards">
+    <div v-for="(i, index) in currencies" :key="index" class="boxx--cards">
       <q-card
         class="boxx--cards--card text-black"
       >
         <q-card-section>
           <div class="text-h6 q-ma-sm flex">
-            <img class="q-mr-sm" v-if="index === 'bitcoin'" src="https://assets.coingecko.com/coins/images/1/thumb/bitcoin.png?1547033579" />
-            <img class="q-mr-sm" v-if="index === 'ethereum'" src="https://assets.coingecko.com/coins/images/279/thumb/ethereum.png?1595348880" />
-            <img class="q-mr-sm" v-if="index === 'dacxi'" style="width: 30px" src="https://assets.coingecko.com/coins/images/4466/small/dacxi.png?1639042471" />
-            <img class="q-mr-sm" v-if="index === 'cosmos'" style="width: 30px" src="https://assets.coingecko.com/coins/images/1481/small/cosmos_hub.png?1555657960" />
-            <img class="q-mr-sm" v-if="index === 'terra-luna'" style="width: 30px" src="https://assets.coingecko.com/coins/images/22951/small/LUNA_wh_small.png?1644226405" />
-            <span style="text-transform: capitalize"> {{index}}</span>
+            <span :style="i.variation > 0 ? 'color: green' : 'color: red'">{{i.name}}</span>
           </div>
         </q-card-section>
         <q-separator ></q-separator>
 
         <q-card-section class="q-pt-lg">
           <span style="border-left: 2px solid orange; height: 30px; padding-right: 5px"></span>
-          <span style="font-weight: 500;" class="q-mt-md">Price</span> - U{{format(i.usd)}}<br />
+          <span style="font-weight: 500;" class="q-mt-md">Compra</span> {{format(i.buy)}}<br />
           <span style="border-left: 2px solid gray; height: 30px; padding-right: 5px"></span>
-          <span style="font-weight: 500" class="q-mt-md">Mkt Cap</span> - U{{format(i.usd_market_cap)}}<br />
+          <span style="font-weight: 500" class="q-mt-md">Venda</span> {{format(i.sell)}}<br />
           <span style="border-left: 2px solid blue; height: 30px; padding-right: 5px"></span>
-          <span style="font-weight: 500" class="q-mt-md">Vol in 24H</span> - U{{format(i.usd_24h_vol)}}<br />
+          <span style="font-weight: 500" class="q-mt-md">Variação </span><span :style="i.variation > 0 ? 'color: green' : 'color: red'"> {{i.variation}}</span><br />
         </q-card-section>
       </q-card>
     </div>
@@ -57,7 +52,9 @@ export default {
   },
   computed: {
     ...mapState('Coin', {
-      coinsObject: 'coin'
+      currencies: 'currencies',
+      stocks: 'stocks',
+      taxes: 'taxes'
     })
   },
   methods: {
@@ -65,7 +62,7 @@ export default {
       setCoin: 'SET_COIN'
     }),
     format (value) {
-      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumSignificantDigits: 14 }).format(value)
+      return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
     },
     getCoin () {
       axios.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Cethereum%2Cdacxi%2Ccosmos%2Cterra-luna&vs_currencies=usd&include_24hr_vol=true&include_market_cap=true')
