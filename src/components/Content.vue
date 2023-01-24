@@ -4,16 +4,30 @@
     <q-text>Escolha quais items deseja visualizar</q-text>
   </div>
 
-  <span class="flex items-center justify-center">
+  <span class="flex items-center justify-center row">
     <div class="q-pa-md" style="width: 320px">
       <q-select dark transition-show="flip-up"
         transition-hide="flip-down" outlined multiple v-model="selectedItem" :options="options" label="Visualização" />
     </div>
+
+    <div class="q-pa-md boxx column">
+      <div v-for="(i, index) in taxes" :key="index" class="boxx--cards">
+          <span class="boxx--cards--title">Principais taxas {{i.date}}</span>
+            <div class="boxx--cards--title--items">
+              <span>Daily Factor {{i.daily_factor}}%</span>
+              <span>Selic {{i.selic}} %</span>
+              <span>Selic Diária {{i.selic_daily}}%</span>
+              <span>CDI Diária {{i.cdi}}%</span>
+              <span>CDI {{i.cdi_daily}}%</span>
+            </div>
+      </div>
+    </div>
+
   </span>
 
   <span v-if="selectedItem.includes('Cambio')">
     <div class="title">
-      <q-text>Principais cambios e cotações</q-text>
+      <q-text>Principais cambios e cotações em relação ao Real - BRL</q-text>
     </div>
     <div class="q-pa-md boxx">
       <div v-for="(i, index) in currencies" :key="index" class="boxx--cards">
@@ -41,7 +55,47 @@
               <span style="border-left: 2px solid gray; height: 30px; padding-right: 5px"></span>
               <span style="font-weight: 500" class="q-mt-md">Venda</span> {{format(i.sell)}}<br />
               <span style="border-left: 2px solid blue; height: 30px; padding-right: 5px"></span>
-              <span style="font-weight: 500" class="q-mt-md">Variação </span><span :style="i.variation > 0 ? 'color: green' : 'color: red'"> {{i.variation}}</span><br />
+              <span style="font-weight: 500" class="q-mt-md">Variação </span><span :style="i.variation > 0 ? 'color: green' : 'color: red'"> {{i.variation}}%</span><br />
+            </q-card-section>
+          </q-card>
+        </Tilt>
+      </div>
+    </div>
+  </span>
+
+  <span v-if="selectedItem.includes('Bitcoin')">
+    <div class="title">
+      <q-text>Principais cambios e cotações em relação ao Real - BRL</q-text>
+    </div>
+    <div class="q-pa-md boxx">
+      <div v-for="(i, index) in bitcoin" :key="index" class="boxx--cards">
+        <Tilt>
+          <q-card
+            class="boxx--cards--card text-black"
+          >
+            <q-card-section>
+              <div class="text-h6 q-ma-sm flex">
+                <span :style="i.variation > 0 ? 'color: green' : 'color: red'">
+                  <span v-if="i.variation > 0">
+                    <q-icon color="green" name="trending_up" />
+                  </span>
+                  <span v-else>
+                    <q-icon color="red" name="trending_down" />
+                  </span>
+                  {{i.name}}</span>
+              </div>
+            </q-card-section>
+            <q-separator ></q-separator>
+
+            <q-card-section class="q-pt-lg">
+              <span style="border-left: 2px solid orange; height: 30px; padding-right: 5px"></span>
+              <span style="font-weight: 500;" class="q-mt-md">Compra </span> {{format(i.buy || 0 , 'US')}}<br />
+              <span style="border-left: 2px solid orange; height: 30px; padding-right: 5px"></span>
+              <span style="font-weight: 500;" class="q-mt-md">Venda</span> {{format(i.sell || 0, 'US')}}<br />
+              <span style="border-left: 2px solid gray; height: 30px; padding-right: 5px"></span>
+              <span style="font-weight: 500" class="q-mt-md">Última negociação</span> {{format(i.last)}}<br />
+              <span style="border-left: 2px solid blue; height: 30px; padding-right: 5px"></span>
+              <span style="font-weight: 500" class="q-mt-md">Variação </span><span :style="i.variation > 0 ? 'color: green' : 'color: red'"> {{i.variation}}%</span><br />
             </q-card-section>
           </q-card>
         </Tilt>
@@ -75,9 +129,9 @@
 
             <q-card-section class="q-pt-lg">
               <span style="border-left: 2px solid orange; height: 30px; padding-right: 5px"></span>
-              <span style="font-weight: 500;" class="q-mt-md">Compra</span> {{i.points}}<br />
+              <span style="font-weight: 500;" class="q-mt-md">Compra</span> {{format(i.points)}}<br />
               <span style="border-left: 2px solid blue; height: 30px; padding-right: 5px"></span>
-              <span style="font-weight: 500" class="q-mt-md">Variação </span><span :style="i.variation > 0 ? 'color: green' : 'color: red'"> {{i.variation}}</span><br />
+              <span style="font-weight: 500" class="q-mt-md">Variação </span><span :style="i.variation > 0 ? 'color: green' : 'color: red'"> {{i.variation}}%</span><br />
             </q-card-section>
           </q-card>
         </Tilt>
@@ -88,50 +142,49 @@
 </template>
 
 <script>
-import Tilt from 'vanilla-tilt-vue'
+// import axios from 'axios'
 
-import axios from 'axios'
+import Tilt from 'vanilla-tilt-vue'
+import Moment from 'moment'
 import { mapMutations, mapState } from 'vuex'
 import { Notify } from 'quasar'
 
 export default {
   created () {
-    this.getCoin()
-    this.timer = setInterval(this.getCoin, 20000)
   },
   components: { Tilt },
   data () {
     return {
-      selectedItem: ['Cambio', 'Cotação'],
-      options: ['Cambio', 'Cotação']
+      selectedItem: ['Cambio', 'Cotação', 'Bitcoin'],
+      options: ['Cambio', 'Cotação', 'Bitcoin']
     }
   },
   computed: {
     ...mapState('Coin', {
       currencies: 'currencies',
       stocks: 'stocks',
-      taxes: 'taxes'
-    })
+      taxes: 'taxes',
+      bitcoin: 'bitcoin'
+    }),
+    fomatDay (date) {
+      console.log('date', date)
+      return Moment(date).format('DD/MM/YYYY')
+    },
+    currencieArray () {
+      const newArray = delete this.currencies.source
+      return newArray
+    }
   },
   methods: {
     ...mapMutations('Coin', {
       setCoin: 'SET_COIN'
     }),
-    format (value) {
-      return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
-    },
-    getCoin () {
-      axios.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Cethereum%2Cdacxi%2Ccosmos%2Cterra-luna&vs_currencies=usd&include_24hr_vol=true&include_market_cap=true')
-        .then((data) => {
-          this.coins = data.data
-          this.setCoin(data.data)
-        })
-        .catch((err) => {
-          console.log('err', err)
-        })
-    },
-    cancelAutoUpdate () {
-      clearInterval(this.timer)
+    format (value, lenguage) {
+      if (lenguage === 'pt') {
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
+      } else {
+        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value)
+      }
     }
   },
   watch: {
@@ -139,13 +192,11 @@ export default {
       console.log('val', val)
       if (val.length === 0) {
         Notify.create({
-          message: 'Para visualizar os dados escolha pelo menos uma opção'
+          message: 'Para visualizar os dados escolha pelo menos uma opção',
+          color: 'teal'
         })
       }
     }
-  },
-  beforeUnmount () {
-    this.cancelAutoUpdate()
   }
 }
 </script>
@@ -169,6 +220,17 @@ export default {
     display: grid;
     width: 290px;
     gap: 20px;
+
+    &--title {
+      color: #f2f2f2;
+      font-weight: bold;
+
+      &--items {
+        color: #f2f2f2;
+        display: flex;
+        flex-direction: column;
+      }
+    }
   }
 }
 

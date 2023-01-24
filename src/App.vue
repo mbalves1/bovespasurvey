@@ -11,9 +11,11 @@ export default defineComponent({
 })
 </script>
 <style>
-/* body {
-  background: var(--bs-light-gray); */
-/* } */
+body {
+  /* background: var(--bs-light-gray); */
+  overflow-x: hidden;
+  background: #2F2F38;
+}
 
 /* we will explain what these classes do next! */
 .v-enter-active,
