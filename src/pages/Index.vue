@@ -1,13 +1,13 @@
 <template>
   <div>
-    <Header @open="drawer"></Header>
+    <Header></Header>
     <div class="slider">
       <div class="slide-track" style="z-index: 10">
-        <div class="slide" v-for="(i, index) in bitcoin" :key="i">
-          <div class="q-pa-md carousel d-flex items-center">
-            <span>{{index}}</span>
-            <span :style="i.variation > 1 ? 'color: green' : 'color: red'">
-              U{{format(i.variation)}}
+        <div class="slide" v-for="(i, index) in array" :key="i">
+          <div class="q-pa-md carousel d-flex column items-center">
+            <span :style="i.variation > 0 ? 'color: green' : 'color: red'">{{index === 'source' ? '' : index}}</span>
+            <span :style="i.variation > 0 ? 'color: green' : 'color: red'">
+              {{i.variation === $NaN ? '' : `${i.variation}%`}}
             </span>
           </div>
         </div>
@@ -41,7 +41,6 @@ export default defineComponent({
   name: 'PageIndex',
   created () {
     this.getData()
-    console.log('thismercadoBitcoin', this.bitcoin)
   },
   computed: {
     ...mapState('Coin', {
@@ -49,7 +48,12 @@ export default defineComponent({
       currencies: 'currencies',
       stocks: 'stocks',
       taxes: 'taxes'
-    })
+    }),
+    array () {
+      console.log('this.bitcoui', this.bitcoin)
+      const newArray = { ...this.bitcoin, ...this.currencies, ...this.stocks }
+      return newArray
+    }
   },
   methods: {
     ...mapActions('Coin', {
@@ -89,13 +93,14 @@ export default defineComponent({
   }
 }
 .slider {
-  /* background: white;
-  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, .125); */
+  // background: #3e3e49;
+  // box-shadow: 0 10px 20px -5px #3e3e49;
   height: 55px;
   margin: auto;
   overflow: hidden;
   position: relative;
   width: 500px;
+  margin-bottom: 20px;
 }
 .slider::before, .slider::after {
   background: linear-gradient(to right, var(--bs-light-gray) 0%, rgba(255, 255, 255, 0) 1%);

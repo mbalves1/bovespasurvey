@@ -1,53 +1,109 @@
 <template>
-<div>
+<div style="background: #2F2F38;">
   <div class="title">
-    <q-text>Principais índices e cotações</q-text>
+    <q-text>Escolha quais items deseja visualizar</q-text>
   </div>
-  <div class="q-pa-md boxx">
-    <div v-for="(i, index) in currencies" :key="index" class="boxx--cards">
-      <q-card
-        class="boxx--cards--card text-black"
-      >
-        <q-card-section>
-          <div class="text-h6 q-ma-sm flex">
-            <span :style="i.variation > 0 ? 'color: green' : 'color: red'">{{i.name}}</span>
-          </div>
-        </q-card-section>
-        <q-separator ></q-separator>
 
-        <q-card-section class="q-pt-lg">
-          <span style="border-left: 2px solid orange; height: 30px; padding-right: 5px"></span>
-          <span style="font-weight: 500;" class="q-mt-md">Compra</span> {{format(i.buy)}}<br />
-          <span style="border-left: 2px solid gray; height: 30px; padding-right: 5px"></span>
-          <span style="font-weight: 500" class="q-mt-md">Venda</span> {{format(i.sell)}}<br />
-          <span style="border-left: 2px solid blue; height: 30px; padding-right: 5px"></span>
-          <span style="font-weight: 500" class="q-mt-md">Variação </span><span :style="i.variation > 0 ? 'color: green' : 'color: red'"> {{i.variation}}</span><br />
-        </q-card-section>
-      </q-card>
+  <span class="flex items-center justify-center">
+    <div class="q-pa-md" style="width: 320px">
+      <q-select dark transition-show="flip-up"
+        transition-hide="flip-down" outlined multiple v-model="selectedItem" :options="options" label="Visualização" />
     </div>
-  </div>
+  </span>
+
+  <span v-if="selectedItem.includes('Cambio')">
+    <div class="title">
+      <q-text>Principais cambios e cotações</q-text>
+    </div>
+    <div class="q-pa-md boxx">
+      <div v-for="(i, index) in currencies" :key="index" class="boxx--cards">
+        <Tilt>
+          <q-card
+            class="boxx--cards--card text-black"
+          >
+            <q-card-section>
+              <div class="text-h6 q-ma-sm flex">
+                <span :style="i.variation > 0 ? 'color: green' : 'color: red'">
+                  <span v-if="i.variation > 0">
+                    <q-icon color="green" name="trending_up" />
+                  </span>
+                  <span v-else>
+                    <q-icon color="red" name="trending_down" />
+                  </span>
+                  {{i.name}} - {{index}}</span>
+              </div>
+            </q-card-section>
+            <q-separator ></q-separator>
+
+            <q-card-section class="q-pt-lg">
+              <span style="border-left: 2px solid orange; height: 30px; padding-right: 5px"></span>
+              <span style="font-weight: 500;" class="q-mt-md">Compra</span> {{format(i.buy)}}<br />
+              <span style="border-left: 2px solid gray; height: 30px; padding-right: 5px"></span>
+              <span style="font-weight: 500" class="q-mt-md">Venda</span> {{format(i.sell)}}<br />
+              <span style="border-left: 2px solid blue; height: 30px; padding-right: 5px"></span>
+              <span style="font-weight: 500" class="q-mt-md">Variação </span><span :style="i.variation > 0 ? 'color: green' : 'color: red'"> {{i.variation}}</span><br />
+            </q-card-section>
+          </q-card>
+        </Tilt>
+      </div>
+    </div>
+  </span>
+
+  <span v-if="selectedItem.includes('Cotação')">
+    <div class="title">
+      <q-text>Principais índices e cotações</q-text>
+    </div>
+    <div class="q-pa-md boxx">
+      <div v-for="(i, index) in stocks" :key="index" class="boxx--cards">
+        <Tilt>
+          <q-card
+            class="boxx--cards--card text-black"
+          >
+            <q-card-section>
+              <div class="text-h6 q-ma-sm flex">
+                <span :style="i.variation > 0 ? 'color: green' : 'color: red'">
+                  <span v-if="i.variation > 0">
+                    <q-icon color="green" name="trending_up" />
+                  </span>
+                  <span v-else>
+                    <q-icon color="red" name="trending_down" />
+                  </span>
+                  {{index}}</span>
+              </div>
+            </q-card-section>
+            <q-separator ></q-separator>
+
+            <q-card-section class="q-pt-lg">
+              <span style="border-left: 2px solid orange; height: 30px; padding-right: 5px"></span>
+              <span style="font-weight: 500;" class="q-mt-md">Compra</span> {{i.points}}<br />
+              <span style="border-left: 2px solid blue; height: 30px; padding-right: 5px"></span>
+              <span style="font-weight: 500" class="q-mt-md">Variação </span><span :style="i.variation > 0 ? 'color: green' : 'color: red'"> {{i.variation}}</span><br />
+            </q-card-section>
+          </q-card>
+        </Tilt>
+      </div>
+    </div>
+  </span>
 </div>
 </template>
 
 <script>
+import Tilt from 'vanilla-tilt-vue'
 
 import axios from 'axios'
 import { mapMutations, mapState } from 'vuex'
+import { Notify } from 'quasar'
 
 export default {
   created () {
     this.getCoin()
     this.timer = setInterval(this.getCoin, 20000)
   },
+  components: { Tilt },
   data () {
     return {
-      name: ['Bitcoin', 'Ethereum', 'Atom', 'Luna', 'Daxci'],
-      coins: {
-        bitcoin: {},
-        ethereum: {},
-        cosmos: {},
-        timer: ''
-      }
+      selectedItem: ['Cambio', 'Cotação'],
+      options: ['Cambio', 'Cotação']
     }
   },
   computed: {
@@ -78,6 +134,16 @@ export default {
       clearInterval(this.timer)
     }
   },
+  watch: {
+    'selectedItem' (val) {
+      console.log('val', val)
+      if (val.length === 0) {
+        Notify.create({
+          message: 'Para visualizar os dados escolha pelo menos uma opção'
+        })
+      }
+    }
+  },
   beforeUnmount () {
     this.cancelAutoUpdate()
   }
@@ -90,6 +156,7 @@ export default {
   margin: 40px 0 20px 0;
   font-size: 32px;
   font-weight: 700;
+  color: #f2f2f2;
 }
 .boxx {
   display: flex;
