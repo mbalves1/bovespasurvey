@@ -50,7 +50,6 @@ export default defineComponent({
       taxes: 'taxes'
     }),
     array () {
-      console.log('this.bitcoui', this.bitcoin)
       const newArray = { ...this.bitcoin, ...this.currencies, ...this.stocks }
       return newArray
     }

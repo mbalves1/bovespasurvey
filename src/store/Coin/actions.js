@@ -8,6 +8,6 @@ export function getData ({ commit }) {
       commit('SET_DATA', results)
     })
     .catch((err) => {
-      console.log('err', err)
+      console.error(err)
     })
 }

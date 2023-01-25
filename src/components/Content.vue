@@ -27,7 +27,7 @@
 
   <span v-if="selectedItem.includes('Cambio')">
     <div class="title">
-      <q-text>Principais cambios e cotações em relação ao Real - BRL</q-text>
+      <q-text>Principais cambios em relação ao Real - BRL</q-text>
     </div>
     <div class="q-pa-md boxx">
       <div v-for="(i, index) in currencies" :key="index" class="boxx--cards">
@@ -64,7 +64,7 @@
     </div>
   </span>
 
-  <span v-if="selectedItem.includes('Bitcoin')">
+  <span v-if="selectedItem.includes('Crypto')">
     <div class="title">
       <q-text>Principais cambios e cotações - USD</q-text>
     </div>
@@ -103,6 +103,8 @@
       </div>
     </div>
   </span>
+
+  {{barchare}}
 
   <span v-if="selectedItem.includes('Cotação')">
     <div class="title">
@@ -146,6 +148,7 @@
 // import axios from 'axios'
 
 import Tilt from 'vanilla-tilt-vue'
+import Chart from 'chart.js/auto'
 // import Moment from 'moment'
 import { mapState } from 'vuex'
 import { Notify } from 'quasar'
@@ -162,13 +165,14 @@ export default {
     setTimeout(() => {
       localStorage.removeItem('access')
       this.$router.push({ path: '/' })
-    }, 50000)
+    }, 100000)
   },
   components: { Tilt },
   data () {
     return {
-      selectedItem: ['Cambio', 'Cotação', 'Bitcoin'],
-      options: ['Cambio', 'Cotação', 'Bitcoin']
+      selectedItem: ['Cambio', 'Cotação', 'Crypto'],
+      options: ['Cambio', 'Cotação', 'Crypto'],
+      barchare: ''
     }
   },
   computed: {
@@ -180,7 +184,7 @@ export default {
       accessUser: 'accessUser'
     }),
     fomatDay () {
-      var data = new Date(),
+      const data = new Date(),
         dia = data.getDate().toString().padStart(2, '0'),
         mes = (data.getMonth() + 1).toString().padStart(2, '0'),
         ano = data.getFullYear()
@@ -192,6 +196,31 @@ export default {
     }
   },
   methods: {
+    newChart () {
+      const data = {
+        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+        datasets: [
+          {
+            label: 'My First dataset',
+            fillColor: 'rgba(220,220,220,0.5)',
+            strokeColor: 'rgba(220,220,220,0.8)',
+            highlightFill: 'rgba(220,220,220,0.75)',
+            highlightStroke: 'rgba(220,220,220,1)',
+            data: [65, 59, 80, 81, 56, 55, 40]
+          },
+          {
+            label: 'My Second dataset',
+            fillColor: 'rgba(151,187,205,0.5)',
+            strokeColor: 'rgba(151,187,205,0.8)',
+            highlightFill: 'rgba(151,187,205,0.75)',
+            highlightStroke: 'rgba(151,187,205,1)',
+            data: [28, 48, 40, 19, 86, 27, 90]
+          }
+        ]
+      }
+      const myBarChart = new Chart().Bar(data)
+      this.barchare = myBarChart
+    },
     format (value, lenguage) {
       if (lenguage === 'pt') {
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
@@ -202,7 +231,6 @@ export default {
   },
   watch: {
     'selectedItem' (val) {
-      console.log('val', val)
       if (val.length === 0) {
         Notify.create({
           message: 'Para visualizar os dados escolha pelo menos uma opção',

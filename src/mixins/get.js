@@ -18,7 +18,7 @@ export default {
           this.setCoin(data.data)
         })
         .catch((err) => {
-          console.log('err', err)
+          console.error(err)
         })
     },
     format (value) {

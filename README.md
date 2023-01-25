@@ -1,20 +1,25 @@
 
-Test for front-end opportunity at Dacxi.
+Test for front-end.
 
-Coingecko api was used
-https://api.coingecko.com
+A aplicação foi desenvolvida em Vue utilizando o Quasar. Algumas libs foram incluídas para animações.
 
-Screen recharges by itself every 20 seconds
+O projeto desenvolvido contém uma tela inicial de login, onde conseguimos também criar uma conta e logar
+Foi incluida uma verificação para que o usuário não consiga avançar pela url. Assim que o login é feito é salvo no localstorage algumas informações que são
+usadas para manter o user logado e deslogar (após 10000).
 
-The app contains a splash screen. To get started, just click on the Start button.
+Para o formulário foi utilizada a validação nativa do quasar.
 
-The screen contains a button in the upper right corner, we can open the menu with options to navigate between the first and second screens.
+Após o login o usuário consegue ver em um carosel as cotações de crypto e cambios principais
 
-On the first screen we have the values ​​of the coins.
+Em todos campos onde mostramos os valores, nomes e icones foram adicionadas as cores correspondentes, verde caso o valor esteja > 0 e vermelho para < 0.
 
-On the second screen, we can check the currency value on a given date. We can also see the search history.
+A aplicação foi hospedada no vercel e conseguimos visualizar no https://bovsurvey.vercel.app/#/
 
-https://crypto-currency-j1d4ximea-mbalves1.vercel.app
+Utilizamos também a Vuex para gerenciamento de estado.
+
+O projeto utiliza a api
+https://hgbrasil.com/status/finance/
+
 
 ## Install the dependencies
 ```bash
@@ -23,7 +28,7 @@ yarn
 
 ### Start the app in development mode (hot-code reloading, error reporting, etc.)
 ```bash
-quasar dev
+yarn quasar dev
 ```
 
 ### Lint the files
