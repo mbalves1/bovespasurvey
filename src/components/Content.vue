@@ -12,7 +12,7 @@
 
     <div class="q-pa-md boxx column">
       <div v-for="(i, index) in taxes" :key="index" class="boxx--cards">
-          <span class="boxx--cards--title">Principais taxas {{i.date}}</span>
+          <span class="boxx--cards--title">Principais taxas {{fomatDay}}</span>
             <div class="boxx--cards--title--items">
               <span>Daily Factor {{i.daily_factor}}%</span>
               <span>Selic {{i.selic}} %</span>
@@ -44,16 +44,17 @@
                   <span v-else>
                     <q-icon color="red" name="trending_down" />
                   </span>
-                  {{i.name}} - {{index}}</span>
+                  <span>{{index === 'source' ? i : i.name}} - {{index === 'source' ? '' : index}}</span>
+                </span>
               </div>
             </q-card-section>
             <q-separator ></q-separator>
 
-            <q-card-section class="q-pt-lg">
+            <q-card-section class="q-pt-lg" v-if="index === 'source' ? '' : true">
               <span style="border-left: 2px solid orange; height: 30px; padding-right: 5px"></span>
-              <span style="font-weight: 500;" class="q-mt-md">Compra</span> {{format(i.buy)}}<br />
+              <span style="font-weight: 500;" class="q-mt-md">Compra</span> {{format(i.buy, 'pt')}}<br />
               <span style="border-left: 2px solid gray; height: 30px; padding-right: 5px"></span>
-              <span style="font-weight: 500" class="q-mt-md">Venda</span> {{format(i.sell)}}<br />
+              <span style="font-weight: 500" class="q-mt-md">Venda</span> {{format(i.sell, 'pt')}}<br />
               <span style="border-left: 2px solid blue; height: 30px; padding-right: 5px"></span>
               <span style="font-weight: 500" class="q-mt-md">Variação </span><span :style="i.variation > 0 ? 'color: green' : 'color: red'"> {{i.variation}}%</span><br />
             </q-card-section>
@@ -65,7 +66,7 @@
 
   <span v-if="selectedItem.includes('Bitcoin')">
     <div class="title">
-      <q-text>Principais cambios e cotações em relação ao Real - BRL</q-text>
+      <q-text>Principais cambios e cotações - USD</q-text>
     </div>
     <div class="q-pa-md boxx">
       <div v-for="(i, index) in bitcoin" :key="index" class="boxx--cards">
@@ -129,7 +130,7 @@
 
             <q-card-section class="q-pt-lg">
               <span style="border-left: 2px solid orange; height: 30px; padding-right: 5px"></span>
-              <span style="font-weight: 500;" class="q-mt-md">Compra</span> {{format(i.points)}}<br />
+              <span style="font-weight: 500;" class="q-mt-md">Compra</span> {{format(i.points, 'pt')}}<br />
               <span style="border-left: 2px solid blue; height: 30px; padding-right: 5px"></span>
               <span style="font-weight: 500" class="q-mt-md">Variação </span><span :style="i.variation > 0 ? 'color: green' : 'color: red'"> {{i.variation}}%</span><br />
             </q-card-section>
@@ -145,12 +146,23 @@
 // import axios from 'axios'
 
 import Tilt from 'vanilla-tilt-vue'
-import Moment from 'moment'
-import { mapMutations, mapState } from 'vuex'
+// import Moment from 'moment'
+import { mapState } from 'vuex'
 import { Notify } from 'quasar'
 
 export default {
   created () {
+    const hasAccount = localStorage.getItem('access')
+    if (hasAccount === null) {
+      this.$router.push({ path: '/' })
+    }
+    if (this.accessUser) {
+      this.$router.push({ path: '/view' })
+    }
+    setTimeout(() => {
+      localStorage.removeItem('access')
+      this.$router.push({ path: '/' })
+    }, 50000)
   },
   components: { Tilt },
   data () {
@@ -164,11 +176,15 @@ export default {
       currencies: 'currencies',
       stocks: 'stocks',
       taxes: 'taxes',
-      bitcoin: 'bitcoin'
+      bitcoin: 'bitcoin',
+      accessUser: 'accessUser'
     }),
-    fomatDay (date) {
-      console.log('date', date)
-      return Moment(date).format('DD/MM/YYYY')
+    fomatDay () {
+      var data = new Date(),
+        dia = data.getDate().toString().padStart(2, '0'),
+        mes = (data.getMonth() + 1).toString().padStart(2, '0'),
+        ano = data.getFullYear()
+      return `${dia}/${mes}/${ano}`
     },
     currencieArray () {
       const newArray = delete this.currencies.source
@@ -176,9 +192,6 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('Coin', {
-      setCoin: 'SET_COIN'
-    }),
     format (value, lenguage) {
       if (lenguage === 'pt') {
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)

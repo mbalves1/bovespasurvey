@@ -5,6 +5,7 @@ export default function () {
     currencies: [],
     stocks: [],
     taxes: [],
+    accessUser: '',
     userAccount: [
       {
         name: 'Murilo',

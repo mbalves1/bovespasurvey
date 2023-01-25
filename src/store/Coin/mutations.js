@@ -16,3 +16,7 @@ export const SET_DATA = (state, data) => {
 export const SET_USER = (state, data) => {
   state.userAccount.push(data)
 }
+
+export const SET_ACCESS = (state, data) => {
+  state.accessUser = data
+}
