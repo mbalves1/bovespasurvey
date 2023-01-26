@@ -30,51 +30,56 @@
       <q-text>Principais cambios em relação ao Real - BRL</q-text>
     </div>
     <div class="q-pa-md boxx">
-      <div v-for="(i, index) in currencies" :key="index" class="boxx--cards">
-        <Tilt>
-          <q-card
-            class="boxx--cards--card text-black"
-            dark
-            @click="openDialog = true"
-          >
-            <q-card-section @click="openDialog = true">
-              <div class="text-h6 q-ma-sm flex">
-                <span :style="i.variation > 0 ? 'color: green' : 'color: red'">
-                  <span v-if="i.variation > 0">
-                    <q-icon color="green" name="trending_up" />
+      <div v-for="(i, index) in currencies" :key="index" class="boxx--cards" >
+        <span v-if="index !== 'source'">
+          <Tilt>
+            <q-card
+              class="boxx--cards--card text-black"
+              dark
+              @click="openModal"
+            >
+              <q-card-section>
+                <div class="text-h6 q-ma-sm flex">
+                  <span :style="i.variation > 0 ? 'color: green' : 'color: red'">
+                    <span v-if="i.variation > 0">
+                      <q-icon color="green" name="trending_up" />
+                    </span>
+                    <span v-else>
+                      <q-icon color="red" name="trending_down" />
+                    </span>
+                    <span>BRL - {{index === 'source' ? '' : index}}</span>
+                    <sub>{{index === 'source' ? i : i.name}}</sub>
                   </span>
-                  <span v-else>
-                    <q-icon color="red" name="trending_down" />
-                  </span>
-                  <span>BRL - {{index === 'source' ? '' : index}}</span>
-                  <sub>{{index === 'source' ? i : i.name}}</sub>
-                </span>
-              </div>
-            </q-card-section>
-            <q-separator ></q-separator>
+                </div>
+              </q-card-section>
+              <q-separator ></q-separator>
 
-            <q-card-section class="q-pt-lg" v-if="index === 'source' ? '' : true">
-              <span style="border-left: 2px solid orange; height: 30px; padding-right: 5px"></span>
-              <span style="font-weight: 500; color: #fff" class="q-mt-md">Compra</span> <span style="font-weight: 500; color: #fff" class="q-mt-md">{{format(i.buy, 'pt')}}</span><br />
-              <span style="border-left: 2px solid gray; height: 30px; padding-right: 5px;"></span>
-              <span style="font-weight: 500; color: #fff" class="q-mt-md">Venda</span> <span style="font-weight: 500; color: #fff" class="q-mt-md">{{format(i.sell, 'pt')}}</span><br />
-              <span style="border-left: 2px solid blue; height: 30px; padding-right: 5px"></span>
-              <span style="font-weight: 500; color: #fff" class="q-mt-md">Variação </span><span :style="i.variation > 0 ? 'color: green' : 'color: red'"> {{i.variation}}%</span><br />
-            </q-card-section>
+              <q-card-section class="q-pt-lg" v-if="index === 'source' ? '' : true">
+                <span style="border-left: 2px solid orange; height: 30px; padding-right: 5px"></span>
+                <span style="font-weight: 500; color: #fff" class="q-mt-md">Compra</span> <span style="font-weight: 500; color: #fff" class="q-mt-md">{{format(i.buy, 'pt')}}</span><br />
+                <span style="border-left: 2px solid gray; height: 30px; padding-right: 5px;"></span>
+                <span style="font-weight: 500; color: #fff" class="q-mt-md">Venda</span> <span style="font-weight: 500; color: #fff" class="q-mt-md">{{format(i.sell, 'pt')}}</span><br />
+                <span style="border-left: 2px solid blue; height: 30px; padding-right: 5px"></span>
+                <span style="font-weight: 500; color: #fff" class="q-mt-md">Variação </span><span :style="i.variation > 0 ? 'color: green' : 'color: red'"> {{i.variation}}%</span><br />
+              </q-card-section>
 
-            <q-dialog v-model="openDialog" dark>
-              <q-card dark>
-                <Bar
-                  width="400px"
-                  id="my-chart-id"
-                  :options="chartOptions"
-                  :data="chartData"
-                  style="background: white; width: 320px"
-                />
-              </q-card>
-            </q-dialog>
-          </q-card>
-        </Tilt>
+              <q-dialog v-model="openDialog" dark>
+                <q-card>
+                  <Bar
+                    width="400px"
+                    id="my-chart-id"
+                    :options="chartOptions"
+                    :data="{
+                      labels: ['Compra', 'Venda', 'Variação'],
+                      datasets: [{ data: [i.buy, i.sell, i.variation] }]
+                    }"
+                    style="background: white; width: 320px"
+                  />
+                </q-card>
+              </q-dialog>
+            </q-card>
+          </Tilt>
+        </span>
       </div>
     </div>
   </span>
@@ -184,7 +189,6 @@ export default {
       localStorage.removeItem('access')
       this.$router.push({ path: '/' })
     }, 500000)
-    console.log('dat', this.currencies)
   },
   components: { Tilt, Bar },
   data () {
@@ -192,13 +196,8 @@ export default {
       openDialog: false,
       selectedItem: ['Cambio', 'Cotação', 'Crypto'],
       options: ['Cambio', 'Cotação', 'Crypto'],
-      chartData: {
-        labels: ['Compra', 'Venda', 'Variação'],
-        datasets: [{ data: [40, 20, 12] }]
-      },
-      chartOptions: {
-        responsive: true
-      }
+      chartData: {},
+      chartOptions: {}
     }
   },
   mounted () {
@@ -224,19 +223,28 @@ export default {
         mes = (data.getMonth() + 1).toString().padStart(2, '0'),
         ano = data.getFullYear()
       return `${dia}/${mes}/${ano}`
-    },
-    currencieArray () {
-      const newArray = delete this.currencies.source
-      return newArray
     }
   },
   methods: {
+    // char (item) {
+    //   this.chartData = {
+    //     labels: ['Compra', 'Venda', 'Variação'],
+    //     datasets: [item]
+    //     // datasets: [{ data: }]
+    //   }
+    //   console.log('item', item)
+    //   console.log('this.chartData', this.chartData)
+    //   return this.chartData
+    // },
     format (value, lenguage) {
       if (lenguage === 'pt') {
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
       } else {
         return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value)
       }
+    },
+    openModal () {
+      this.openDialog = true
     }
   },
   watch: {

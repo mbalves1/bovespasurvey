@@ -12,7 +12,7 @@
           <q-input dark
           lazy-rules :rules="[ val => val && val.length > 0 || 'E-mail obrigatório']" class="" outlined v-model="emailClient" label="Digite seu e-mail" color="white" />
 
-          <q-input dark lazy-rules :rules="[ val => val && val.length > 0 || 'Digite sua senha']" v-model="passwordClient" class="q-mt-lg" outlined :type="isPwd ? 'password' : 'text'" color="white" label="Digite seu acesso">
+          <q-input dark lazy-rules :rules="[ val => val && val.length > 0 || 'Digite sua senha']" v-model="passwordClient" class="q-mt-sm" outlined :type="isPwd ? 'password' : 'text'" color="white" label="Digite seu acesso">
             <template v-slot:append>
               <q-icon
                 :name="isPwd ? 'visibility_off' : 'visibility'"
@@ -29,12 +29,12 @@
         </div>
         <div v-if="!create">
           <p class="q-mt-lg" color="white">CADASTRE SUA CONTA</p>
-          <q-input dark class="q-mt-lg" @blur="validateAccount"
+          <q-input dark class="q-mt-sm" @blur="validateAccount"
           lazy-rules :rules="[ val => val && val.length > 0 || 'Por favor, digite seu nome']" outlined v-model="name" label="Digite seu nome" color="white" />
 
-          <q-input lazy-rules @blur="validateAccount" :rules="[ val => val && val.length > 0 || 'Escolha seu melhor e-mail']" dark class="q-mt-lg" outlined v-model="emailCreate" label="Digite seu e-mail" color="white" />
+          <q-input lazy-rules @blur="validateAccount" :rules="[ val => val && val.length > 0 || 'Escolha seu melhor e-mail']" dark class="q-mt-sm" outlined v-model="emailCreate" label="Digite seu e-mail" color="white" />
 
-          <q-input lazy-rules @blur="validateAccount" :rules="[ val => val && val.length > 0 || 'Escolha uma senha']" dark v-model="passCreate" class="q-mt-lg cursor-pointer" outlined :type="isPwd ? 'password' : 'text'" color="white" label="Digite seu acesso">
+          <q-input lazy-rules @blur="validateAccount" :rules="[ val => val && val.length > 0 || 'Escolha uma senha']" dark v-model="passCreate" class="q-mt-sm cursor-pointer" outlined :type="isPwd ? 'password' : 'text'" color="white" label="Digite seu acesso">
             <template v-slot:append>
               <q-icon
                 :name="isPwd ? 'visibility_off' : 'visibility'"
@@ -44,7 +44,7 @@
             </template>
           </q-input>
           <div class="d-flex column items-center">
-            <q-btn @click="createAccount" :disabled="disabledCreateButton" color="secondary q-mt-lg" rounded style="width:190px" label="Create Account"></q-btn>
+            <q-btn @click="createAccount" :disabled="disabledCreateButton" color="secondary q-mt-sm" rounded style="width:190px" label="Create Account"></q-btn>
             <q-btn @click="loginBack" color="secondary q-mt-lg" rounded style="width:190px" label="Logar"></q-btn>
           </div>
         </div>
@@ -126,6 +126,13 @@ export default {
       const { userAccount, emailClient, passwordClient, setAccess } = this
       const randomNumber = Math.random() * (100000 - 1) + 1
       const hasAccount = userAccount.filter((user) => {
+        if (user.email !== emailClient) {
+          console.log('aqui')
+          return Notify.create({
+            message: 'Conta não encontrada, verifique sua senha e email, por favor.',
+            color: 'negative'
+          })
+        }
         if (user.email === emailClient) {
           if (user.pass === passwordClient) {
             localStorage.setItem('access', JSON.stringify(`${randomNumber}1${emailClient}`))
@@ -134,13 +141,6 @@ export default {
             return true
           }
           return true
-        }
-        if (user.email !== emailClient) {
-          console.log('aqui')
-          return Notify.create({
-            message: 'Conta não encontrada, verifique sua senha e email, por favor.',
-            color: 'negative'
-          })
         }
         return false
       })
