@@ -34,8 +34,10 @@
         <Tilt>
           <q-card
             class="boxx--cards--card text-black"
+            dark
+            @click="openDialog = true"
           >
-            <q-card-section>
+            <q-card-section @click="openDialog = true">
               <div class="text-h6 q-ma-sm flex">
                 <span :style="i.variation > 0 ? 'color: green' : 'color: red'">
                   <span v-if="i.variation > 0">
@@ -44,7 +46,8 @@
                   <span v-else>
                     <q-icon color="red" name="trending_down" />
                   </span>
-                  <span>{{index === 'source' ? i : i.name}} - {{index === 'source' ? '' : index}}</span>
+                  <span>BRL - {{index === 'source' ? '' : index}}</span>
+                  <sub>{{index === 'source' ? i : i.name}}</sub>
                 </span>
               </div>
             </q-card-section>
@@ -52,12 +55,24 @@
 
             <q-card-section class="q-pt-lg" v-if="index === 'source' ? '' : true">
               <span style="border-left: 2px solid orange; height: 30px; padding-right: 5px"></span>
-              <span style="font-weight: 500;" class="q-mt-md">Compra</span> {{format(i.buy, 'pt')}}<br />
-              <span style="border-left: 2px solid gray; height: 30px; padding-right: 5px"></span>
-              <span style="font-weight: 500" class="q-mt-md">Venda</span> {{format(i.sell, 'pt')}}<br />
+              <span style="font-weight: 500; color: #fff" class="q-mt-md">Compra</span> <span style="font-weight: 500; color: #fff" class="q-mt-md">{{format(i.buy, 'pt')}}</span><br />
+              <span style="border-left: 2px solid gray; height: 30px; padding-right: 5px;"></span>
+              <span style="font-weight: 500; color: #fff" class="q-mt-md">Venda</span> <span style="font-weight: 500; color: #fff" class="q-mt-md">{{format(i.sell, 'pt')}}</span><br />
               <span style="border-left: 2px solid blue; height: 30px; padding-right: 5px"></span>
-              <span style="font-weight: 500" class="q-mt-md">Variação </span><span :style="i.variation > 0 ? 'color: green' : 'color: red'"> {{i.variation}}%</span><br />
+              <span style="font-weight: 500; color: #fff" class="q-mt-md">Variação </span><span :style="i.variation > 0 ? 'color: green' : 'color: red'"> {{i.variation}}%</span><br />
             </q-card-section>
+
+            <q-dialog v-model="openDialog" dark>
+              <q-card dark>
+                <Bar
+                  width="400px"
+                  id="my-chart-id"
+                  :options="chartOptions"
+                  :data="chartData"
+                  style="background: white; width: 320px"
+                />
+              </q-card>
+            </q-dialog>
           </q-card>
         </Tilt>
       </div>
@@ -104,8 +119,6 @@
     </div>
   </span>
 
-  {{barchare}}
-
   <span v-if="selectedItem.includes('Cotação')">
     <div class="title">
       <q-text>Principais índices e cotações</q-text>
@@ -148,10 +161,15 @@
 // import axios from 'axios'
 
 import Tilt from 'vanilla-tilt-vue'
-import Chart from 'chart.js/auto'
+
 // import Moment from 'moment'
 import { mapState } from 'vuex'
 import { Notify } from 'quasar'
+
+import { Bar } from 'vue-chartjs'
+import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
+
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
 export default {
   created () {
@@ -165,14 +183,31 @@ export default {
     setTimeout(() => {
       localStorage.removeItem('access')
       this.$router.push({ path: '/' })
-    }, 100000)
+    }, 500000)
+    console.log('dat', this.currencies)
   },
-  components: { Tilt },
+  components: { Tilt, Bar },
   data () {
     return {
+      openDialog: false,
       selectedItem: ['Cambio', 'Cotação', 'Crypto'],
       options: ['Cambio', 'Cotação', 'Crypto'],
-      barchare: ''
+      chartData: {
+        labels: ['Compra', 'Venda', 'Variação'],
+        datasets: [{ data: [40, 20, 12] }]
+      },
+      chartOptions: {
+        responsive: true
+      }
+    }
+  },
+  mounted () {
+    this.chartData = {
+      labels: ['Compra', 'Venda', 'Variação'],
+      datasets: [{ data: [40, 20, 12] }]
+    }
+    this.chartOptions = {
+      responsive: true
     }
   },
   computed: {
@@ -196,31 +231,6 @@ export default {
     }
   },
   methods: {
-    newChart () {
-      const data = {
-        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-        datasets: [
-          {
-            label: 'My First dataset',
-            fillColor: 'rgba(220,220,220,0.5)',
-            strokeColor: 'rgba(220,220,220,0.8)',
-            highlightFill: 'rgba(220,220,220,0.75)',
-            highlightStroke: 'rgba(220,220,220,1)',
-            data: [65, 59, 80, 81, 56, 55, 40]
-          },
-          {
-            label: 'My Second dataset',
-            fillColor: 'rgba(151,187,205,0.5)',
-            strokeColor: 'rgba(151,187,205,0.8)',
-            highlightFill: 'rgba(151,187,205,0.75)',
-            highlightStroke: 'rgba(151,187,205,1)',
-            data: [28, 48, 40, 19, 86, 27, 90]
-          }
-        ]
-      }
-      const myBarChart = new Chart().Bar(data)
-      this.barchare = myBarChart
-    },
     format (value, lenguage) {
       if (lenguage === 'pt') {
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)

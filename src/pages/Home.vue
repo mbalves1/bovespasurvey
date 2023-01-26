@@ -135,8 +135,6 @@ export default {
           }
           return true
         }
-        console.log('>>', user.email)
-        console.log('1>>', emailClient)
         if (user.email !== emailClient) {
           console.log('aqui')
           return Notify.create({
