@@ -179,6 +179,9 @@ p {
 }
 
 .container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: #2F2F38;
   height: 100vh;
   &--card {
