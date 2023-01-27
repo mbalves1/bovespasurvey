@@ -1,7 +1,7 @@
 <template>
 <div style="background: #2F2F38;">
   <div class="title">
-    <q-text>Escolha quais items deseja visualizar</q-text>
+    <q-text>Escolha quais itens deseja visualizar</q-text>
   </div>
 
   <span class="flex items-center justify-center row">
@@ -22,7 +22,6 @@
             </div>
       </div>
     </div>
-
   </span>
 
   <span v-if="selectedItem.includes('Cambio')">
@@ -62,22 +61,24 @@
                 <span style="border-left: 2px solid blue; height: 30px; padding-right: 5px"></span>
                 <span style="font-weight: 500; color: #fff" class="q-mt-md">Variação </span><span :style="i.variation > 0 ? 'color: green' : 'color: red'"> {{i.variation}}%</span><br />
               </q-card-section>
-
-              <q-dialog v-model="openDialog" dark>
-                <q-card>
-                  <Bar
-                    width="400px"
-                    id="my-chart-id"
-                    :options="chartOptions"
-                    :data="{
-                      labels: ['Compra', 'Venda', 'Variação'],
-                      datasets: [{ data: [i.buy, i.sell, i.variation] }]
-                    }"
-                    style="background: white; width: 320px"
-                  />
-                </q-card>
-              </q-dialog>
             </q-card>
+            <q-dialog v-model="openDialog" dark>
+              <q-card>
+                <Bar
+                  width="400px"
+                  id="my-chart-id"
+                  :options="chartOptions"
+                  :data="{
+                    labels: ['Variação', 'bu'],
+                    datasets: [{
+                      label: 'Variação',
+                      data: [i.variation]
+                    }]
+                  }"
+                  style="background: white; width: 320px"
+                />
+              </q-card>
+            </q-dialog>
           </Tilt>
         </span>
       </div>
@@ -90,8 +91,26 @@
     </div>
     <div class="q-pa-md boxx">
       <div v-for="(i, index) in bitcoin" :key="index" class="boxx--cards">
+        <q-dialog v-model="openDialog" dark>
+          <q-card>
+            <Bar
+              width="400px"
+              id="my-chart-id"
+              :options="chartOptions"
+              :data="{
+                labels: ['Variação'],
+                datasets: [{
+                  label: 'Variação',
+                  data: [i.variation]
+                }]
+              }"
+              style="background: white; width: 320px"
+            />
+          </q-card>
+        </q-dialog>
         <Tilt>
           <q-card
+            @click="openModal"
             class="boxx--cards--card text-black"
           >
             <q-card-section>
@@ -130,8 +149,23 @@
     </div>
     <div class="q-pa-md boxx">
       <div v-for="(i, index) in stocks" :key="index" class="boxx--cards">
+        <q-dialog v-model="openDialog" dark>
+          <q-card>
+            <Bar
+              width="400px"
+              id="my-chart-id"
+              :options="chartOptions"
+              :data="{
+                labels: ['Variação'],
+                datasets: [{ data: [i.variation] }]
+              }"
+              style="background: white; width: 320px"
+            />
+          </q-card>
+        </q-dialog>
         <Tilt>
           <q-card
+            @click="openModal"
             class="boxx--cards--card text-black"
           >
             <q-card-section>
@@ -163,11 +197,9 @@
 </template>
 
 <script>
-// import axios from 'axios'
-
+// Lib
 import Tilt from 'vanilla-tilt-vue'
 
-// import Moment from 'moment'
 import { mapState } from 'vuex'
 import { Notify } from 'quasar'
 
@@ -188,7 +220,7 @@ export default {
     setTimeout(() => {
       localStorage.removeItem('access')
       this.$router.push({ path: '/' })
-    }, 500000)
+    }, 50000)
   },
   components: { Tilt, Bar },
   data () {
@@ -198,15 +230,6 @@ export default {
       options: ['Cambio', 'Cotação', 'Crypto'],
       chartData: {},
       chartOptions: {}
-    }
-  },
-  mounted () {
-    this.chartData = {
-      labels: ['Compra', 'Venda', 'Variação'],
-      datasets: [{ data: [40, 20, 12] }]
-    }
-    this.chartOptions = {
-      responsive: true
     }
   },
   computed: {
@@ -226,16 +249,6 @@ export default {
     }
   },
   methods: {
-    // char (item) {
-    //   this.chartData = {
-    //     labels: ['Compra', 'Venda', 'Variação'],
-    //     datasets: [item]
-    //     // datasets: [{ data: }]
-    //   }
-    //   console.log('item', item)
-    //   console.log('this.chartData', this.chartData)
-    //   return this.chartData
-    // },
     format (value, lenguage) {
       if (lenguage === 'pt') {
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)

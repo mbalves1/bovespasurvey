@@ -1,11 +1,11 @@
 
 Test for front-end.
 
-A aplicação foi desenvolvida em Vue utilizando o Quasar. Algumas libs foram incluídas para animações.
+A aplicação foi desenvolvida em Vue utilizando o Quasar. Algumas libs foram incluídas para animações como tilt e chartjs.
 
 O projeto desenvolvido contém uma tela inicial de login, onde conseguimos também criar uma conta e logar
 Foi incluida uma verificação para que o usuário não consiga avançar pela url. Assim que o login é feito é salvo no localstorage algumas informações que são
-usadas para manter o user logado e deslogar (após 10000).
+usadas para manter o user logado e deslogar (após 50000).
 
 Para o formulário foi utilizada a validação nativa do quasar.
 
